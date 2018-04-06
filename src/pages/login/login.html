@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-navbar transparent>
+    <ion-title>
+      LOGIN
+    </ion-title>
+    <ion-buttons end>
+        <button ion-button icon-only (click)="info()" >
+          <ion-icon name="ios-information-circle-outline"></ion-icon>
+        </button>
+      </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding class="bg-image">
+  <form [formGroup]="formgroup">
+
+    <button id="boton" ion-button icon-left (click)="login()" full outline style="color:primary">
+      <ion-icon name="logo-googleplus"></ion-icon>
+      Inicia Sesión con Google+
+    </button>
+  </form>
+</ion-content>

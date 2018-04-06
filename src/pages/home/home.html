@@ -1,14 +1,40 @@
-<ion-header>
-  <ion-navbar>
-    <ion-title>
-      Ionic Blank
-    </ion-title>
+<ion-header no-border>
+  <ion-navbar transparent>
+
+    <ion-item style="background-color: transparent; border:none">
+      <ion-avatar item-start>
+        <img class="card-background-page" [hidden]="!info" [src]="info.imageUrl" />
+      </ion-avatar>
+      {{info.displayName}}
+      {{info.email}}
+    </ion-item>
+
+    <ion-buttons end>
+      <button ion-button icon-only (click)="logout()" >
+        <ion-icon name="md-log-out"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+<ion-content padding class="bg-image">
+  <form [formGroup]="formgroup">
+
+
+
+    <ion-item id="contenido" style="font-size: 14px; background-color:transparent;font-weight: bold">
+      <ion-input style="color:black" type="text" formControlName="text" [(ngModel)]="texto"></ion-input>
+      <ion-label style="color:black" floating>Texto a cifrar o descrifrar</ion-label>
+    </ion-item>
+    <h6 *ngIf="(formgroup.controls.text.hasError('pattern'))" align="center" style="color:rgb(201, 49, 49);font-size: 13px">
+      <ion-icon name="ios-alert-outline"></ion-icon>
+      No se admiten caracteres especiales, acentos ni números
+    </h6>
+    <br>
+    <br>
+    <button id="contenido" type="reset" style="color:green; border-color:green;font-weight: bold" ion-button (click)="mostrarOpciones(texto)"
+      full outline [disabled]="!formgroup.valid">Opciones</button>
+
+  </form>
+
 </ion-content>
