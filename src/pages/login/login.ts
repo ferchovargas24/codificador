@@ -24,7 +24,7 @@ export class LoginPage {
   i: number;
   user: AbstractControl;
   pass: AbstractControl;
-isRegistered : boolean = false ;
+  isRegistered: boolean;
 
   constructor(public navCtrl: NavController, public fb: FormBuilder, private mensaje: ToastController,
     public googleplus: GooglePlus,
@@ -55,26 +55,7 @@ isRegistered : boolean = false ;
       'webClientId': '662816514180-0g85a3ndvvuri8s83dvo1jt5dtuff1ff.apps.googleusercontent.com',
       'offline': true
     }).then(res => {
-      const refUsuarios: firebase.database.Reference = firebase.database().ref('/usuarios');
-      var usuario = res.email;
-      
-      refUsuarios.on('value', usuSnap => {
-        usuSnap.forEach(usuarioSnap => {
-          
-          if (usuarioSnap.val().usuario == res.email) {
-            this.isRegistered = true;
-          }
-          return false;
-        });
-      });
-
-      if(this.isRegistered == true){
-
-      }else{
-        refUsuarios.push({usuario});
-      }
-      
-
+   
       firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(res.idToken))
         .then(succ => {
 
@@ -97,10 +78,11 @@ isRegistered : boolean = false ;
     })
 
   }
+
   info() {
     let alert = this.alertCtrl.create({
       title: 'Equipo',
-      subTitle: 'Rocha Vargas José Fernando (Programador) ' +'\n Pichardo Aguilar Jorge (Investigador)',
+      subTitle: 'Rocha Vargas José Fernando (Programador) ' + '\n Pichardo Aguilar Jorge (Investigador)',
       buttons: ['OK']
     });
     alert.present();

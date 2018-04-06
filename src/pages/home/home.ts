@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, AlertController, ActionSheetController, NavParams, ToastController } from 'ionic-angular';
+import { NavController, AlertController, ActionSheetController, NavParams, ToastController, LoadingController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { EmailComposer } from '@ionic-native/email-composer';
 import firebase from 'firebase';
@@ -22,8 +22,9 @@ export class HomePage {
   info;
   passMens;
   usuario;
-  
-  public refUsuarios: firebase.database.Reference = firebase.database().ref('/usuarios');
+  isRegistered;
+
+  public  refMensajes: firebase.database.Reference = firebase.database().ref('/mensajesCodificados');
 
   constructor(public navCtrl: NavController, private navParams: NavParams,
     public fb: FormBuilder,
@@ -31,7 +32,8 @@ export class HomePage {
     private mensaje: ToastController,
     private actionSheetCtrl: ActionSheetController,
     private email: EmailComposer,
-    private gplus: GooglePlus
+    private gplus: GooglePlus,
+    private load: LoadingController
   ) {
 
     this.info = this.navParams.get('info');
@@ -41,23 +43,12 @@ export class HomePage {
     this.text = this.formgroup.controls['text'];
   }
 
-
-  cifrando(txt, password) {
+  cifrando(txt, password, destinatario) {
 
     var mensajeCifrado = base64Encode(txt);
 
-    this.refUsuarios.on('value', usuSnap => {
-      usuSnap.forEach(usuarioSnap => {
-        
-        if (usuarioSnap.val().usuario == this.info.email) {
-          this.usuario=usuarioSnap.key;
-        }
-        return false;
-      });
-    });
-
-    const refMensajes: firebase.database.Reference = firebase.database().ref('/usuarios/'+ this.usuario+'/mensajesCodificados');
-    refMensajes.push({ mensajeCifrado, password });
+    
+    this.refMensajes.push({ mensajeCifrado, password });
     let alert = this.alerta.create({
       title: 'Gracias por usar nuestro codificador',
       message: "Tu texto codificado es: " + mensajeCifrado + " \nPor favor, apuntalo",
@@ -67,7 +58,8 @@ export class HomePage {
           handler: data => {
             this.email.open({
               app: 'gmail',
-              body: "Mensaje codificado: " + mensajeCifrado + "\nContraseña: " + password
+              body: "Mensaje codificado: " + mensajeCifrado + "\nContraseña: " + password,
+              to: destinatario,
 
             });
           }
@@ -81,11 +73,9 @@ export class HomePage {
 
   descifrando(txt: string, password) {
 
-
-const refMensajes: firebase.database.Reference = firebase.database().ref('/usuarios/'+this.usuario+'/mensajesCodificados');
-    refMensajes.on('value', mensajeSnap => {
+    this.refMensajes.on('value', mensajeSnap => {
       mensajeSnap.forEach(mensSnap => {
-        
+
         if (mensSnap.val().mensajeCifrado == txt) {
           this.passMens = mensSnap.val().password;
         }
@@ -93,41 +83,49 @@ const refMensajes: firebase.database.Reference = firebase.database().ref('/usuar
       });
     });
 
+    let loading = this.load.create({
+      content: 'Verificando',
+      spinner: 'dots'
+    });
+    loading.present();
 
-   
+    setTimeout(() => {
+      if (this.passMens == password) {
 
-    if (this.passMens == password) {
-
-      var mensajeDescifrado = base64Decode(txt)
-
-      let alert = this.alerta.create({
-        title: 'Gracias por usar nuestro codificador',
-        message: "El texto decodificado es: " + mensajeDescifrado + " Por favor, apuntalo",
-        buttons: ['OK']
-
-      })
-      alert.present();
-
-    } else {
-
-      let alert = this.alerta.create({
-        title: 'ERROR',
-        message: "La contraseña es incorrecta",
-        buttons: [
-          {
-            text: 'Cancelar',
-          },
-          {
-            text: 'Volver a intentar',
-            handler: data => {
-              this.mostrarOpciones(txt)
+        var mensajeDescifrado = base64Decode(txt)
+  
+        let alert = this.alerta.create({
+          title: 'Gracias por usar nuestro codificador',
+          message: "El texto decodificado es: " + mensajeDescifrado + " Por favor, apuntalo",
+          buttons: ['OK']
+  
+        })
+        alert.present();
+  
+      } else {
+  
+        let alert = this.alerta.create({
+          title: 'ERROR',
+          message: "La contraseña es incorrecta",
+          buttons: [
+            {
+              text: 'Cancelar',
+            },
+            {
+              text: 'Volver a intentar',
+              handler: data => {
+                this.mostrarOpciones(txt)
+              }
             }
-          }
-        ]
+          ]
 
-      })
-      alert.present();
-    }
+        })
+        alert.present();
+      }
+      loading.dismiss();
+    }, 1000);
+
+    
 
 
   }
@@ -143,12 +141,18 @@ const refMensajes: firebase.database.Reference = firebase.database().ref('/usuar
 
             let prompt = this.alerta.create({
               title: 'Cifrando',
-              message: "Ambos campos son requeridos",
+              message: "Asigna una contraseña",
               inputs: [
                 {
                   name: 'contraseña',
                   placeholder: 'Contraseña',
                   type: 'password',
+
+                },
+                {
+                  name: 'destinatario',
+                  placeholder: 'Mail de destinatario',
+                  type: 'email',
 
                 }
               ],
@@ -159,7 +163,7 @@ const refMensajes: firebase.database.Reference = firebase.database().ref('/usuar
                 {
                   text: 'OK',
                   handler: data => {
-                    this.cifrando(txt, data.contraseña);
+                    this.cifrando(txt, data.contraseña, data.destinatario);
                   }
                 }
               ]
