@@ -49,9 +49,10 @@ export class HomePage {
 
     
     this.refMensajes.push({ mensajeCifrado, password });
+
     let alert = this.alerta.create({
       title: 'Gracias por usar nuestro codificador',
-      message: "Tu texto codificado es: " + mensajeCifrado + " \nPor favor, apuntalo",
+      message: "Tu texto codificado es: " + mensajeCifrado,
       buttons: [
         {
           text: 'Mandar por email',
@@ -96,7 +97,7 @@ export class HomePage {
   
         let alert = this.alerta.create({
           title: 'Gracias por usar nuestro codificador',
-          message: "El texto decodificado es: " + mensajeDescifrado + " Por favor, apuntalo",
+          message: "El texto decodificado es: " + mensajeDescifrado,
           buttons: ['OK']
   
         })
@@ -141,7 +142,7 @@ export class HomePage {
 
             let prompt = this.alerta.create({
               title: 'Cifrando',
-              message: "Asigna una contraseña",
+              message: "Asigna una contraseña y destinatario",
               inputs: [
                 {
                   name: 'contraseña',
@@ -151,7 +152,7 @@ export class HomePage {
                 },
                 {
                   name: 'destinatario',
-                  placeholder: 'Mail de destinatario',
+                  placeholder: 'Mail del destinatario',
                   type: 'email',
 
                 }
@@ -213,10 +214,15 @@ export class HomePage {
 
 
   logout() {
-
-    this.gplus.logout().then(() => {
-      this.navCtrl.setRoot(LoginPage)
+    let loading = this.load.create({
+      content: 'Vuelve pronto',
+      spinner:'dots'
     })
-  }
+    loading.present();
+    this.gplus.logout().then(() => {
+      this.navCtrl.setRoot(LoginPage)  
+      loading.dismiss();
+    })
 
+  }
 }

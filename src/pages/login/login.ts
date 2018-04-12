@@ -6,12 +6,6 @@ import { GooglePlus } from '@ionic-native/google-plus';
 import { AngularFireModule } from 'angularFire2';
 import firebase from 'firebase'
 import { EmailComposer } from '@ionic-native/email-composer';
-/**
- * Generated class for the LoginPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 
 @IonicPage()
 @Component({
@@ -72,11 +66,10 @@ export class LoginPage {
         }).catch(ns => {
           this.mensaje.create({
             message: "Hubo un error",
-            duration: 3000
-          })
+          }).present();
+          loading.dismiss();
         })
     })
-
   }
 
   info() {
