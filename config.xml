@@ -86,4 +86,5 @@
         <variable name="REVERSED_CLIENT_ID" value="com.googleuserconten.apps.662816514180-0g85a3ndvvuri8s83dvo1jt5dtuff1ff" />
     </plugin>
     <plugin name="cordova-plugin-email-composer" spec="^0.8.15" />
+    <engine name="android" spec="~7.0.0" />
 </widget>
